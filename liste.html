@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einkaufsliste</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5230/5230364.png" type="image/png"> <!-- Favicon hinzufügen -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Verhindert Scrollen der gesamten Seite */
+        }
+        .header {
+            background-color: #1e1e1e;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            border-bottom-left-radius: 15px; /* Abgerundete Ecken */
+            border-bottom-right-radius: 15px; /* Abgerundete Ecken */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        .header img {
+            width: 40px; /* Breite des Logos */
+            height: auto; /* Höhe automatisch anpassen */
+            vertical-align: middle; /* Vertikale Ausrichtung */
+            margin-right: 10px; /* Abstand zwischen Logo und Titel */
+        }
+        .container {
+            background: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            padding: 70px 10px 20px; /* Platz für den Header */
+            width: 90%;
+            max-width: 400px;
+            margin-top: 60px; /* Abstand vom Header */
+            overflow-y: auto; /* Scrollen der Liste */
+            max-height: 80vh; /* Maximalhöhe für die Liste */
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            display: inline-block; /* Inline-Block für das Logo */
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between; /* Platz zwischen Text und Checkbox */
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            transition: background 0.3s;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        li:hover {
+            background: #2a2a2a;
+        }
+        .checkbox-container {
+            position: relative;
+            width: 30px; /* Breite für die runde Checkbox */
+            height: 30px; /* Höhe für die runde Checkbox */
+        }
+        input[type="checkbox"] {
+            position: absolute;
+            opacity: 0; /* Unsichtbar machen */
+            cursor: pointer;
+            width: 100%; /* Breite anpassen */
+            height: 100%; /* Höhe anpassen */
+        }
+        .custom-checkbox {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #444;
+            border-radius: 50%; /* Abgerundete Checkbox */
+            transition: background 0.3s, transform 0.2s; /* Animation für den Hover */
+        }
+        input[type="checkbox"]:checked + .custom-checkbox {
+            background-color: #4caf50; /* Grüne Farbe für die aktivierte Checkbox */
+            transform: scale(1.1); /* Leichte Vergrößerung beim Aktivieren */
+        }
+        input[type="text"] {
+            width: calc(100% - 20px); /* Breite anpassen, um Platz für den Button zu lassen */
+            padding: 12px; /* Mehr Padding für ein besseres Aussehen */
+            border: none; /* Kein Rand */
+            border-radius: 25px; /* Abgerundete Ecken */
+            background-color: #333; /* Dunkelgrauer Hintergrund */
+            color: #e0e0e0; /* Helle Schriftfarbe */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Leichter Schatten */
+            transition: background 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none; /* Kein Rahmen bei Fokussierung */
+            background-color: #444; /* Dunklerer Hintergrund bei Fokussierung */
+        }
+        .button-container {
+            display: flex;
+            justify-content: center; /* Zentriert den Button */
+            margin-top: 10px; /* Abstand nach dem Eingabefeld */
+        }
+        button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 25px; /* Abgerundete Ecken */
+            padding: 12px 20px; /* Gleiche Höhe wie das Eingabefeld */
+            cursor: pointer;
+            width: 100%; /* Breite des Buttons anpassen */
+            transition: background 0.3s, transform 0.2s; /* Animation beim Hover */
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        button:hover {
+            background-color: #3700b3;
+            transform: translateY(-2px); /* Leichte Erhöhung beim Hover */
+        }
+        .small-button {
+            background-color: #d32f2f; /* Rote Hintergrundfarbe für den Löschen-Button */
+            border-radius: 50%; /* Rundes Design */
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            padding: 5px; /* Kleinere Polsterung */
+            width: 36px; /* Feste Breite für runden Button */
+            height: 36px; /* Feste Höhe für runden Button */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .small-button:hover {
+            background-color: #c62828; /* Dunklerer Rotton beim Hover */
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+        .share-button {
+            position: absolute; /* Absolute Positionierung */
+            right: 15px; /* Abstand vom rechten Rand */
+            top: 15px; /* Abstand vom oberen Rand */
+            background-color: #03a9f4; /* Heller Blauton */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Rundes Design */
+            padding: 8px; /* Kleinerer Padding für runden Button */
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            width: 36px; /* Feste Breite für runden Button */
+            height: 36px; /* Feste Höhe für runden Button */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .share-button:hover {
+            background-color: #0288d1; /* Dunklerer Blauton beim Hover */
+            transform: translateY(-2px); /* Leichte Erhöhung beim Hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://cdn-icons-png.flaticon.com/512/5230/5230364.png" alt="Logo"> <!-- Logo hinzufügen -->
+        <h1>Einkaufsliste</h1>
+        <button class="share-button" onclick="shareList()">🔗</button> <!-- Teilen-Button -->
+    </div>
+    <div class="container">
+        <input type="text" id="itemInput" placeholder="Neues Item hinzufügen..." autofocus>
+        <div class="button-container">
+            <button onclick="addItem()">Hinzufügen</button>
+        </div>
+        <ul id="itemList"></ul>
+    </div>
+
+    <script>
+        const itemList = document.getElementById('itemList');
+        const itemInput = document.getElementById('itemInput');
+
+        // Lade die gespeicherten Artikel aus dem Local Storage
+        document.addEventListener('DOMContentLoaded', loadItems);
+
+        function loadItems() {
+            const items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+            items.forEach(item => addItemToList(item.text, item.completed));
+        }
+
+        function addItem() {
+            const itemText = itemInput.value.trim();
+            if (itemText === '') return;
+
+            addItemToList(itemText, false);
+            itemInput.value = '';
+            saveItems();
+        }
+
+        function addItemToList(text, completed) {
+            const listItem = document.createElement('li');
+
+            // Text des Artikels
+            const textNode = document.createTextNode(text);
+            listItem.appendChild(textNode);
+
+            // Checkbox erstellen
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'checkbox-container';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = completed;
+            checkbox.onchange = function () {
+                if (checkbox.checked) {
+                    listItem.classList.add('completed');
+                } else {
+                    listItem.classList.remove('completed');
+                }
+                saveItems();
+            };
+            checkboxContainer.appendChild(checkbox);
+            const customCheckbox = document.createElement('span');
+            customCheckbox.className = 'custom-checkbox';
+            checkboxContainer.appendChild(customCheckbox);
+            listItem.appendChild(checkboxContainer);
+
+            // Löschen-Button
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'small-button';
+            deleteButton.textContent = '🗑️';
+            deleteButton.onclick = function () {
+                itemList.removeChild(listItem);
+                saveItems();
+            };
+            listItem.appendChild(deleteButton);
+
+            // Markiere den Artikel als erledigt
+            if (completed) {
+                listItem.classList.add('completed');
+            }
+
+            itemList.appendChild(listItem);
+        }
+
+        function saveItems() {
+            const items = Array.from(itemList.children).map(li => {
+                return {
+                    text: li.childNodes[0].nodeValue.trim(),
+                    completed: li.querySelector('input[type="checkbox"]').checked
+                };
+            });
+            localStorage.setItem('shoppingList', JSON.stringify(items));
+        }
+
+        function shareList() {
+            const items = Array.from(itemList.children).map(li => {
+                return li.childNodes[0].nodeValue.trim();
+            }).join(', ');
+            navigator.clipboard.writeText(items).then(() => {
+                alert('Einkaufsliste kopiert: ' + items);
+            });
+        }
+    </script>
+</body>
+</html>
